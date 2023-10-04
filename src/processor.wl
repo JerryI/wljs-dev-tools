@@ -21,10 +21,10 @@ InternalEvaluator[str_String, block_, signature_][callback_] := With[{$CellUid =
       (* blocks the output if the was a command from the procesor *)
       If[block === True, $evaluated = Null]; 
 
-    (* replaces the output with a registered WebObjects/FrontEndObjects and releases created held frontend objects *)
+    
     With[{$result = $evaluated},
 
-      (* truncate the output, if it is too long and create a fake object to represent it *)
+     
       With[{$string = StringReplace[ToString[$result, InputForm], {"\[NoBreak]"->"", "\[Pi]"->"$Pi$"}]},
 
         callback[
