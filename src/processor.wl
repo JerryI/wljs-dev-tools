@@ -1,12 +1,37 @@
-BeginPackage["JerryI`WolframJSFrontend`DevEvaluator`"];
+BeginPackage["JerryI`WolframJSFrontend`DevEvaluator`", {"CodeParser`"}];
 
 
 Begin["`Private`"];
 
+SplitExpression[astr_] := With[{str = StringReplace[astr, {"%"->"Global`$out", "$Pi$"->"\[Pi]", ".master"->""}]},
+  Select[Select[(StringTake[str, Partition[Join[{1}, #, {StringLength[str]}], 2]] &@
+   Flatten[{#1 - 1, #2 + 1} & @@@ 
+     Sort@
+      Cases[
+       CodeParser`CodeConcreteParse[str, 
+         CodeParser`SourceConvention -> "SourceCharacterIndex"][[2]], 
+       LeafNode[Token`Newline, _, a_] :> Lookup[a, Source, Nothing]]]), StringQ], (StringLength[#]>0) &]
+];
 
-DevProcessor[expr_String, signature_String, callback_] := Module[{str = StringDrop[expr, StringLength[First[StringSplit[expr, "\n"]]] ]},
+WolframCheckSyntax[str_String] := 
+    Module[{syntaxErrors = Cases[CodeParser`CodeParse[str],(ErrorNode|AbstractSyntaxErrorNode|UnterminatedGroupNode|UnterminatedCallNode)[___],Infinity]},
+        If[Length[syntaxErrors]=!=0 ,
+            
+
+            Return[StringRiffle[
+                TemplateApply["Syntax error `` at line `` column ``",
+                    {ToString[#1],Sequence@@#3[CodeParser`Source][[1]]}
+                ]&@@@syntaxErrors
+
+            , "\n"], Module];
+        ];
+        Return[True, Module];
+    ];
+
+DevProcessor[expr_String, signature_String, callback_] := Module[{block= False, str = StringDrop[expr, StringLength[First[StringSplit[expr, "\n"]]] ]},
   Print["DevProcessor!"];
-  JerryI`WolframJSFrontend`Notebook`Notebooks[signature]["kernel"][InternalEvaluator[str, signature, "master"], callback, "Link"->"WSTP"];
+  If[StringTake[str, -1] === ";", block = True; str = StringDrop[str, -1]];
+  InternalEvaluator[str, block, signature][callback];
 ];
 
 
@@ -16,7 +41,7 @@ DevQ[str_] := StringMatchQ[str, StartOfString ~~ ".master" ~~ __];
 JerryI`WolframJSFrontend`Notebook`NotebookAddEvaluator[
   DevQ -> <|
     "SyntaxChecker"->(True&), 
-    "Epilog"->(#&), 
+    "Epilog"->SplitExpression, 
     "Prolog"->(#&), 
     "Evaluator"->DevProcessor
   |>, 
@@ -38,7 +63,8 @@ InternalEvaluator[str_String, block_, signature_][callback_] := With[{$CellUid =
 
      
       With[{$string = StringReplace[ToString[$result, InputForm], {"\[NoBreak]"->"", "\[Pi]"->"$Pi$"}]},
-
+        Print["CALLBACK!"];
+        Print[$string];
         callback[
           $string,
 
