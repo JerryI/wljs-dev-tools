@@ -28,9 +28,9 @@ WolframCheckSyntax[str_String] :=
         Return[True, Module];
     ];
 
-DevProcessor[expr_String, signature_String, callback_] := Module[{block= False, str = StringDrop[expr, StringLength[First[StringSplit[expr, "\n"]]] ]},
+DevProcessor[expr_String, signature_String, callback_] := Module[{block= False, str = StringReplace[expr, ".master"->""]},
   Print["DevProcessor!"];
-  If[StringTake[str, -1] === ";", block = True; str = StringDrop[str, -1]];
+  If[StringLength[str] > 0, If[StringTake[str, -1] === ";", block = True; str = StringDrop[str, -1]]];
   InternalEvaluator[str, block, signature][callback];
 ];
 
