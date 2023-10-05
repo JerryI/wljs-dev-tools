@@ -1,15 +1,26 @@
 BeginPackage["JerryI`WolframJSFrontend`DevEvaluator`"];
 
-Begin["Private`"];
+
+Begin["`Private`"];
+
 
 DevProcessor[expr_String, signature_String, callback_] := Module[{str = StringDrop[expr, StringLength[First[StringSplit[expr, "\n"]]] ]},
   Print["DevProcessor!"];
   JerryI`WolframJSFrontend`Notebook`Notebooks[signature]["kernel"][InternalEvaluator[str, signature, "master"], callback, "Link"->"WSTP"];
 ];
 
-DevQ[str_]      := Length[StringCases[StringSplit[str, "\n"] // First, RegularExpression["^\\.(master)$"]]] > 0;
 
-JerryI`WolframJSFrontend`Notebook`NotebookAddEvaluator[(DevQ      ->  <|"SyntaxChecker"->(True&),               "Epilog"->(#&),             "Prolog"->(#&), "Evaluator"->DevProcessor       |>), "HighestPriority"];
+DevQ[str_] := StringMatchQ[str, StartOfString ~~ ".master" ~~ __];
+
+
+JerryI`WolframJSFrontend`Notebook`NotebookAddEvaluator[
+  DevQ -> <|
+    "SyntaxChecker"->(True&), 
+    "Epilog"->(#&), 
+    "Prolog"->(#&), "Evaluator"->DevProcessor
+  |>, 
+  "HighestPriority"
+];
 
 
 InternalEvaluator[str_String, block_, signature_][callback_] := With[{$CellUid = CreateUUID[]},
@@ -48,6 +59,8 @@ InternalEvaluator[str_String, block_, signature_][callback_] := With[{$CellUid =
   ]
 ];
 
+
 End[];
+
 
 EndPackage[];
