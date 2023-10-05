@@ -17,7 +17,8 @@ JerryI`WolframJSFrontend`Notebook`NotebookAddEvaluator[
   DevQ -> <|
     "SyntaxChecker"->(True&), 
     "Epilog"->(#&), 
-    "Prolog"->(#&), "Evaluator"->DevProcessor
+    "Prolog"->(#&), 
+    "Evaluator"->DevProcessor
   |>, 
   "HighestPriority"
 ];
