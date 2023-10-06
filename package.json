@@ -8,7 +8,7 @@
   "wljs-meta": {
     "wl": "src/processor.wl"
   },
-  "usersone": true,
+  "defaultPackage": true,
   "repository": {
     "type": "git",
     "url": "https://github.com/JerryI/wljs-dev-tools"
