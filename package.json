@@ -1,12 +1,13 @@
 {
   "name": "wljs-dev-tools",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Dev tools for WLJS Editor",
   "scripts": {
     "build": "node --max-old-space-size=8192 ./node_modules/.bin/rollup --config rollup.config.mjs"
   },
   "wljs-meta": {
-    "wl": "src/processor.wl"
+    "wl": "src/processor.wl",
+    "jsmodule": "src/kernel.js"
   },
   "defaultPackage": true,
   "repository": {
