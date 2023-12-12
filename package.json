@@ -1,6 +1,6 @@
 {
   "name": "wljs-dev-tools",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Dev tools for WLJS Editor",
   "scripts": {
     "build": "node --max-old-space-size=8192 ./node_modules/.bin/rollup --config rollup.config.mjs",

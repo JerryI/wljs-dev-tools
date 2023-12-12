@@ -28,10 +28,10 @@ WolframCheckSyntax[str_String] :=
         Return[True, Module];
     ];
 
-DevProcessor[expr_String, signature_String, callback_] := Module[{block= False, str = StringReplace[expr, ".master"->""]},
+DevProcessor[expr_String, signature_String, parent_String, callback_] := Module[{block= False, str = StringReplace[expr, ".master"->""]},
   Print["DevProcessor!"];
   If[StringLength[str] > 0, If[StringTake[str, -1] === ";", block = True; str = StringDrop[str, -1]]];
-  InternalEvaluator[str, block, signature][callback];
+  InternalEvaluator[str, block, signature, parent][callback];
 ];
 
 
@@ -49,7 +49,7 @@ JerryI`WolframJSFrontend`Notebook`NotebookAddEvaluator[
 ];
 
 
-InternalEvaluator[str_String, block_, signature_][callback_] := With[{$CellUid = CreateUUID[]},
+InternalEvaluator[str_String, block_, signature_, parent_][callback_] := With[{$CellUid = CreateUUID[]},
   Block[{$NotebookID = signature, $evaluated, Global`$ignoreLongStrings = False},
 
       (* convert, and replace all frontend objects with its representations (except Set) and evaluate the result *)
